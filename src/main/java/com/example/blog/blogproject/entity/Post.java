@@ -2,6 +2,8 @@ package com.example.blog.blogproject.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -34,7 +36,7 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "author_id",nullable = true)
     private User author ;
 
     @ManyToMany(fetch =FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
@@ -136,8 +138,15 @@ public class Post {
         return tags;
     }
 
-    public void setTags(List<Tags> tags) {
-        this.tags = tags;
+    public void setTags(String tags) {
+        List<String> tagNames = Arrays.asList(tags.split(","));
+        List<Tags> tag = new ArrayList<>();
+        for (String tagName : tagNames) {
+            // Check if the tag already exists in the database
+            Tags newTag = new Tags(tagName, LocalDateTime.now(), LocalDateTime.now());
+            tag.add(newTag);
+        }
+        this.tags = tag;
     }
 
     public List<Comments> getComments() {
@@ -146,5 +155,22 @@ public class Post {
 
     public void setComments(List<Comments> comments) {
         this.comments = comments;
+    }
+
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", excerpt='" + excerpt + '\'' +
+                ", content='" + content + '\'' +
+                ", isPublished=" + isPublished +
+                ", publishedAt=" + publishedAt +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", author=" + author +
+                ", tags=" + tags +
+                ", comments=" + comments +
+                '}';
     }
 }
