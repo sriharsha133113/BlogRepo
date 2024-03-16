@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Posts</title>
+    <link rel="stylesheet" type="text/css" href="/get_posts.css">
+    <style>
+        .post-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .post-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+<h1>List of Posts</h1>
+<div class="container">
+  <div th:each="post : ${posts}" >
+<!--      <a href="@{/readForm(formId=${post.id})}">-->
+      <a th:href="@{'/blog/readForm?formId=' + ${post.id}}"><div class="box">
+        <h2 th:text="${post.title}"></h2>
+        <p  th:text="${post.author?.name}"></p>
+<!--        <p th:if="${post.author == null}">Author not available</p>-->
+        <p th:text="${post.publishedAt}"></p>
+        <p th:text="${post.excerpt}"></p>
+
+      </div></a>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

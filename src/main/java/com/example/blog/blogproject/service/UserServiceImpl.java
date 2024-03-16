@@ -1,8 +1,6 @@
 package com.example.blog.blogproject.service;
 
-import com.example.blog.blogproject.dao.PostRepository;
-import com.example.blog.blogproject.dao.UserRepository;
-import com.example.blog.blogproject.entity.Post;
+import com.example.blog.blogproject.Repository.UserRepository;
 import com.example.blog.blogproject.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +22,10 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(theUser);
 
+    }
+
+    @Override
+    public User FindUser() {
+        return userRepository.findById(2).get();
     }
 }

@@ -1,6 +1,5 @@
-package com.example.blog.blogproject.dao;
+package com.example.blog.blogproject.Repository;
 
-import com.example.blog.blogproject.entity.Post;
 import com.example.blog.blogproject.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 

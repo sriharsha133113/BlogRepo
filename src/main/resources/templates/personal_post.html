@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Posts</title>
+    <link rel="stylesheet" type="text/css" href="/personal_posts.css">
+    <style>
+        .post-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .post-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="container">
+                <h2 th:text="${post.title}"></h2>
+                <p  th:text="${post.author?.name}"></p>
+                <p th:text="${post.publishedAt}"></p>
+                <p th:text="${post.content}"></p>
+
+    </div>
+    <a th:href="@{'/blog/updateForm?formId=' + ${post.id}}"><button>updates</button></a><br>
+    <a th:href="@{'/blog/deleteForm?formId=' + ${post.id}}"><button>Delete</button></a>
+</div>
+<form th:method="post" th:action="@{/blog/addComments}" th:object="${comments}" >
+
+    <div>
+        <input type="text"  class="form-control" th:field="*{comment}">
+        <input type="hidden"  th:field="${post.id}">
+    </div>
+        <input type="submit" value="Add comment">
+</form>
+<div class="items" th:each="eachcomment:${post.comments}">
+    <p th:text="${eachcomment.comment}"/>
+    <div class = "buttons">
+        <a th:href="@{/blog/updateComment(commentId = ${eachcomment.id})}">
+            <input type="button" value="Update">
+        </a>
+        <a th:href="@{/blog/deleteComment(commentId = ${eachcomment.id})}">
+            <input type="button" value="delete">
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

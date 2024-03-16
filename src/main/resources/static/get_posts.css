@@ -1,0 +1,23 @@
+.container{
+
+   display:grid;
+   row-gap:20px;
+   column-gap:20px;
+   grid-template-columns:500px 500px;
+   grid-auto-rows:600px;
+   text-align:center;
+
+}
+
+.box{
+   border:2px solid black;
+
+}
+
+.main{
+   text-align:center;
+}
+a{
+text-decoration:none;
+color:black;
+}

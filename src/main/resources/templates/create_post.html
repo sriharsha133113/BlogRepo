@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -17,6 +18,7 @@
         <div class="form-group">
             <label for="tags">Tags</label>
             <input type="text" id="tags" name="tags" class="form-control" th:field="*{tags}" required>
+            <input type="hidden" id="createdAt" name="createdAt" class="form-control" th:field="*{createdAt}">
             <small class="form-text text-muted">Separate tags with commas (e.g., tag1, tag2, tag3)</small>
         </div>
         <div class="form-group">
@@ -28,3 +30,4 @@
 </div>
 </body>
 </html>
+

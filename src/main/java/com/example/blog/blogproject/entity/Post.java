@@ -1,6 +1,9 @@
 package com.example.blog.blogproject.entity;
 
+import com.example.blog.blogproject.service.TagService;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +38,8 @@ public class Post {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "author_id",nullable = true)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
+    @JoinColumn(name = "author_id")
     private User author ;
 
     @ManyToMany(fetch =FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
@@ -130,24 +133,56 @@ public class Post {
         return author;
     }
 
-    public void setAuthor(User author) {
-        this.author = author;
+    public void setAuthor(User authors) {
+        System.out.println("author="+authors);
+        this.author = authors;
     }
 
-    public List<Tags> getTags() {
+    public List<Tags> getNormalTags() {
         return tags;
+    }
+
+    public String getTags() {
+        StringBuilder tagsString = new StringBuilder();
+        if(this.tags==null){
+            return null;
+        }
+        for (Tags tag : this.tags) {
+            tagsString.append(tag.getName()).append(",");
+        }
+        if (tagsString.length() > 0) {
+            tagsString.deleteCharAt(tagsString.length() - 1);
+        }
+        return tagsString.toString();
+
     }
 
     public void setTags(String tags) {
         List<String> tagNames = Arrays.asList(tags.split(","));
         List<Tags> tag = new ArrayList<>();
         for (String tagName : tagNames) {
-            // Check if the tag already exists in the database
+
             Tags newTag = new Tags(tagName, LocalDateTime.now(), LocalDateTime.now());
             tag.add(newTag);
         }
         this.tags = tag;
     }
+
+    public void setTagsList(List<Tags> tags)
+    {
+        this.tags = null;
+        this.tags = tags;
+    }
+
+    public void addComment(Comments comment)
+    {
+        if(comments==null)
+        {
+            comments = new ArrayList<>();
+        }
+        comments.add(comment);
+    }
+
 
     public List<Comments> getComments() {
         return comments;

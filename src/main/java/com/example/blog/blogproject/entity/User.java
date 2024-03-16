@@ -23,7 +23,7 @@ public class User {
 
 
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "author", cascade = CascadeType.ALL)
     private List<Post> posts;
 
     public User() {

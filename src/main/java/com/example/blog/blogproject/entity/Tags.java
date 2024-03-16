@@ -72,12 +72,6 @@ public class Tags{
 
     @Override
     public String toString() {
-        return "Tags{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", posts=" + posts +
-                '}';
+        return name; // Only return the tag name
     }
 }

@@ -1,0 +1,98 @@
+/* Style for main container *//*
+
+.main {
+    margin: 20px auto;
+    width: 80%;
+}
+
+*/
+/* Style for container *//*
+
+.container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+*/
+/* Style for headings *//*
+
+h2 {
+    margin-bottom: 10px;
+}
+
+*/
+/* Style for buttons *//*
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+*/
+
+/* Style for main container */
+.main {
+    margin: 20px auto;
+    width: 80%;
+}
+
+/* Style for container */
+.container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* Style for headings */
+h2 {
+    margin-bottom: 10px;
+}
+
+/* Style for buttons */
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Style for comments */
+.items {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.items p {
+    margin-bottom: 5px;
+}
+
+.items .buttons {
+    margin-top: 10px;
+}
+
+.items .buttons input[type="button"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.items .buttons input[type="button"]:hover {
+    background-color: #0056b3;
+}

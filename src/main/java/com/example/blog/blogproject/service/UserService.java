@@ -6,4 +6,6 @@ import com.example.blog.blogproject.entity.User;
 public interface UserService {
 
     void save(User theUser);
+
+    User FindUser();
 }
