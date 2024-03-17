@@ -124,6 +124,12 @@ public class BlogController {
         return "get_posts"; // Assuming "get_posts" is your view name for displaying posts
     }
 
+    @PostMapping("/search")
+    public String searchPosts(@RequestParam("query") String query, Model model) {
+        List<Post> searchResults = postService.searchPosts(query);
+        model.addAttribute("posts", searchResults);
+        return "get_posts"; // Create a new Thymeleaf template for displaying search results
+    }
 
 
     @PostMapping("/addComments")
