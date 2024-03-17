@@ -108,6 +108,24 @@ public class BlogController {
 
     }
 
+
+
+    @GetMapping("/sort")
+    public String sortPosts(@RequestParam("sort") String sortType, Model model) {
+        if ("latest".equals(sortType)) {
+
+            List<Post> latestPosts = postService.getLatestPosts();
+            model.addAttribute("posts", latestPosts);
+        } else if ("oldest".equals(sortType)) {
+
+            List<Post> oldestPosts = postService.getOldestPosts();
+            model.addAttribute("posts", oldestPosts);
+        }
+        return "get_posts"; // Assuming "get_posts" is your view name for displaying posts
+    }
+
+
+
     @PostMapping("/addComments")
     public String addComments(Model themodel,@ModelAttribute("post")Post thepost,@ModelAttribute("comments")Comments thecomment){
         Post currentPost = postService.findById(thepost.getId());
@@ -124,17 +142,7 @@ public class BlogController {
         return "personal_post";
 
     }
-//
-//    @GetMapping("/updateComment")
-//    public String updateComment(@RequestParam("commentId") int theId,Model themodel){
-//
-//        Comments comment = commentService.findById(theId);
-//        themodel.addAttribute("commentId",comment.getId());
-//
-//        themodel.addAttribute("comments",comment);
-//        return "update_comment_form";
-//
-//    }
+
 
     @GetMapping("/updateComment")
     public String updateComment(@RequestParam("commentId") int theId,Model themodel){
@@ -149,12 +157,7 @@ public class BlogController {
 
     @PostMapping("/saveupdateComment")
     public String saveUpdatedComment(@RequestParam("presentcommentId") int theId,@RequestParam("presentcomment") String thecomment){
-//        commentService.save(updatedComment); // Save the updated comment
-//        return "redirect:/blog/getposts";
-//    int commentId = Integer.parseInt( updatedComment.getId());
-////
-////    // Set the updated comment ID
-//    updatedComment.setId(commentId);
+
         Comments comment = commentService.findById(theId);
 
         comment.setUpdatedAt(LocalDateTime.now());
@@ -167,23 +170,6 @@ public class BlogController {
 
 
 
-//    @PostMapping("/saveupdateComment")
-//    public String saveUpdatedComment(@ModelAttribute("comment") Comments updatedComment){
-////        commentService.save(updatedComment); // Save the updated comment
-////        return "redirect:/blog/getposts";
-////    int commentId = Integer.parseInt( updatedComment.getId());
-//////
-//////    // Set the updated comment ID
-////    updatedComment.setId(commentId);
-//
-//        updatedComment.setUpdatedAt(LocalDateTime.now());
-//
-//
-//
-//    commentService.save(updatedComment);
-//
-//    return "redirect:/blog/getposts";
-//    }
 
 
     @GetMapping("/deleteComment")
@@ -191,5 +177,8 @@ public class BlogController {
         commentService.deleteComment(commentId);
         return "redirect:/blog/getposts";
     }
+
+
+
 
 }

@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -21,11 +22,11 @@
 <h1>List of Posts</h1>
 <div class="container">
   <div th:each="post : ${posts}" >
-<!--      <a href="@{/readForm(formId=${post.id})}">-->
+&lt;!&ndash;      <a href="@{/readForm(formId=${post.id})}">&ndash;&gt;
       <a th:href="@{'/blog/readForm?formId=' + ${post.id}}"><div class="box">
         <h2 th:text="${post.title}"></h2>
         <p  th:text="${post.author?.name}"></p>
-<!--        <p th:if="${post.author == null}">Author not available</p>-->
+&lt;!&ndash;        <p th:if="${post.author == null}">Author not available</p>&ndash;&gt;
         <p th:text="${post.publishedAt}"></p>
         <p th:text="${post.excerpt}"></p>
 
@@ -33,6 +34,129 @@
   </div>
 
 </div>
+</div>
+</body>
+</html>
+-->
+
+<!--
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Posts</title>
+    <link rel="stylesheet" type="text/css" href="/get_posts.css">
+    <style>
+        .post-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .post-content {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <h1>List of Posts</h1>
+    <div class="formsort">
+    <form th:action="@{/blog/sort}" method="get">
+        <label for="sort">Sort By:</label>
+        <select id="sort" name="sort">
+            <option value="latest">Latest</option>
+            <option value="oldest">Oldest</option>
+        </select>
+        <button type="submit">Sort</button>
+    </form>
+   </div>
+    <div class="container">
+        &lt;!&ndash; Form for sorting &ndash;&gt;
+
+
+        &lt;!&ndash; Posts &ndash;&gt;
+        <div th:each="post : ${posts}">
+            <a th:href="@{'/blog/readForm?formId=' + ${post.id}}">
+                <div class="box post-box">
+                    <h2 th:text="${post.title}"></h2>
+                    <p th:text="${post.author?.name}"></p>
+                    <p th:text="${post.publishedAt}"></p>
+                    <p th:text="${post.excerpt}"></p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Posts</title>
+    <link rel="stylesheet" type="text/css" href="/get_posts.css">
+    <style>
+        .post-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .post-content {
+            display: none;
+        }
+        .formsearch {
+            margin-bottom: 20px;
+        }
+        .formsearch input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .formsearch button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <h1>List of Posts</h1>
+    <div class="formsearch">
+        <form th:action="@{/blog/search}" method="post">
+            <input type="text" name="query" placeholder="Search...">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <div class="formsort">
+        <form th:action="@{/blog/sort}" method="get">
+            <label for="sort">Sort By:</label>
+            <select id="sort" name="sort">
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
+            </select>
+            <button type="submit">Sort</button>
+        </form>
+    </div>
+    <div class="container">
+        <!-- Posts -->
+        <div th:each="post : ${posts}">
+            <a th:href="@{'/blog/readForm?formId=' + ${post.id}}">
+                <div class="box post-box">
+                    <h2 th:text="${post.title}"></h2>
+                    <p th:text="${post.author?.name}"></p>
+                    <p th:text="${post.publishedAt}"></p>
+                    <p th:text="${post.excerpt}"></p>
+                </div>
+            </a>
+        </div>
+    </div>
 </div>
 </body>
 </html>

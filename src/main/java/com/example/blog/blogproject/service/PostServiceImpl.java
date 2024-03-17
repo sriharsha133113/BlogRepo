@@ -106,28 +106,27 @@ public class PostServiceImpl implements  PostService {
 //        return postRepository.findById(theId);
     }
 
-//    @Override
-//    @Transactional
-//    public void deleteById(int theId) {
-//        postRepository.deleteById(theId);
-//    }
-
-
-//    @Override
-//    @Transactional
-//    public void deleteById(Post post) {
-//
-//            postRepository.deleteById(pos);
-//        }
-//    }
-
     @Override
     @Transactional
     public void deletePost(Post post) {
         System.out.println("delte serveImpl");
-//        System.out.println(post);
         postRepository.delete(post);
 
+    }
+
+    @Override
+    public List<Post> getLatestPosts() {
+        return postRepository.findAllByOrderByPublishedAtDesc();
+    }
+
+    @Override
+    public List<Post> getOldestPosts() {
+        return postRepository.findAllByOrderByPublishedAtAsc();
+    }
+
+    @Override
+    public List<Post> searchPosts(String query) {
+        return postRepository.findByTitleContainingOrContentContainingOrTagsNameContaining(query, query, query);
     }
 
 }

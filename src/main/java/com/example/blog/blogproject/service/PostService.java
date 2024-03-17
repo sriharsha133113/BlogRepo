@@ -20,4 +20,10 @@ public interface PostService {
 //    void deleteById(int theId);
 
     void deletePost(Post post);
+
+    List<Post> getLatestPosts();
+
+    List<Post> getOldestPosts();
+
+    List<Post> searchPosts(String query);
 }
