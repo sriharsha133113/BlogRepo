@@ -14,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Controller
@@ -28,7 +30,6 @@ public class BlogController {
     @Autowired
     private CommentService commentService;
 
-
     @GetMapping("/createpost")
     public  String createPost(Model theModel){
         Post thepost=new Post();
@@ -37,7 +38,6 @@ public class BlogController {
         return "create_post";
 
     }
-
 
     @PostMapping("/savepost")
     public String savePost(@ModelAttribute("post") Post post) {
@@ -57,7 +57,6 @@ public class BlogController {
         postService.save(post);
         return "redirect:/blog/getposts";
     }
-
 
     @GetMapping("/getposts")
     public String getAllPosts(Model model) {
@@ -118,20 +117,33 @@ public class BlogController {
 
     }
 
+//    @GetMapping("/sort")
+//    public String sortPosts(@RequestParam("sort") String sortType, Model model) {
+//        if ("latest".equals(sortType)) {
+//
+//            List<Post> latestPosts = postService.getLatestPosts();
+//            model.addAttribute("posts", latestPosts);
+//        } else if ("oldest".equals(sortType)) {
+//
+//            List<Post> oldestPosts = postService.getOldestPosts();
+//            model.addAttribute("posts", oldestPosts);
+//        }
+//        return "get_posts";
+//    }
 
     @GetMapping("/sort")
-    public String sortPosts(@RequestParam("sort") String sortType, Model model) {
+    public String sortPosts(@RequestParam("sort") String sortType, @RequestParam("query") String query, Model model) {
+        List<Post> filteredPosts = postService.searchPosts(query);
         if ("latest".equals(sortType)) {
-
-            List<Post> latestPosts = postService.getLatestPosts();
-            model.addAttribute("posts", latestPosts);
+            Collections.sort(filteredPosts, Comparator.comparing(Post::getPublishedAt).reversed());
         } else if ("oldest".equals(sortType)) {
-
-            List<Post> oldestPosts = postService.getOldestPosts();
-            model.addAttribute("posts", oldestPosts);
+            Collections.sort(filteredPosts, Comparator.comparing(Post::getPublishedAt));
         }
+        model.addAttribute("posts", filteredPosts);
         return "get_posts";
     }
+
+
 
     @PostMapping("/search")
     public String searchPosts(@RequestParam("query") String query, Model model) {
@@ -141,6 +153,18 @@ public class BlogController {
     }
 
 
+//    @PostMapping("/search")
+//    public String searchPosts(@RequestParam(value = "query") String query, @RequestParam(value = "sort", defaultValue = "latest") String sortType, Model model) {
+//        List<Post> searchResults = postService.searchPosts(query);
+//        if ("latest".equals(sortType)) {
+//            Collections.sort(searchResults, Comparator.comparing(Post::getPublishedAt).reversed());
+//        } else if ("oldest".equals(sortType)) {
+//            Collections.sort(searchResults, Comparator.comparing(Post::getPublishedAt));
+//        }
+//        model.addAttribute("posts", searchResults);
+//        return "get_posts";
+//    }
+//
     @PostMapping("/addComments")
     public String addComments(Model themodel,@ModelAttribute("post")Post thepost,@ModelAttribute("comments")Comments thecomment){
         Post currentPost = postService.findById(thepost.getId());

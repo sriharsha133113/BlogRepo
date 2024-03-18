@@ -36,6 +36,7 @@
     <div class="formsearch">
         <form th:action="@{/blog/search}" method="post">
             <input type="text" name="query" placeholder="Search...">
+            <input type="hidden" name="sort" value="latest">
             <button type="submit">Search</button>
         </form>
     </div>
@@ -46,6 +47,7 @@
                 <option value="latest">Latest</option>
                 <option value="oldest">Oldest</option>
             </select>
+            <input type="hidden" name="query" th:value="${param.query != null} ? ${param.query} : ''" />
             <button type="submit">Sort</button>
         </form>
     </div>
