@@ -12,7 +12,7 @@ public interface PostService {
     List<Post> getAllPosts();
 //    void setTags(Post post, String tags);
 
-    void checkForTags(List<Tags> tags);
+//    void checkForTags(List<Tags> tags);
     List<Tags> checkedForTags(List<Tags> tags);
 
     Post findById(int theId);

@@ -40,42 +40,7 @@ public class PostServiceImpl implements  PostService {
         return postRepository.findAll();
     }
 
-//    public void setTags(Post post, String tags) {
-//        List<String> tagNames = Arrays.asList(tags.split(","));
-//        List<Tags> tagList = new ArrayList<>();
-//
-//        for (String tagName : tagNames) {
-//            Tags existingTag = tagService.findByName(tagName);
-//
-//            if (existingTag == null) {
-//                // Tag already exists, reuse it
-////                tagList.add(existingTag);
-//                Tags newTag = new Tags(tagName, LocalDateTime.now(), LocalDateTime.now());
-//                tagService.saveTag(newTag);
-//                tagList.add(newTag);
-//            }
-////            else {
-////                // Tag doesn't exist, create a new one
-////                Tags newTag = new Tags(tagName, LocalDateTime.now(), LocalDateTime.now());
-////                tagService.saveTag(newTag);
-////                tagList.add(newTag);
-////            }
-//        }
-//
-//        post.setTags(tagList.toString());
-//    }
 
-
-    public void checkForTags(List<Tags> tags)
-    {
-        for(Tags tag:tags) {
-            Optional<Tags> tagName = tagService.findByName(tag.getName());
-            if (!tagName.isEmpty()) {
-                tags.remove(tag);
-                tags.add(tagName.get());
-            }
-        }
-    }
 
     public List<Tags> checkedForTags(List<Tags> tags) {
         List<Tags> newTags = new ArrayList<>();
@@ -99,11 +64,10 @@ public class PostServiceImpl implements  PostService {
             post = result.get();
         }
         else {
-            // we didn't find the employee
+
             throw new RuntimeException("Did not find employee id - " + theId);
         }
         return post;
-//        return postRepository.findById(theId);
     }
 
     @Override

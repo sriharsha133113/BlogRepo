@@ -45,19 +45,5 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
-
-//    @Override
-//    public Comments findById(int theId) {
-//        Optional<Comments> result = cRepository.findById(theId);
-//        Post post = null;
-//
-//        if (result.isPresent()) {
-//            post = result.get();
-//        }
-//        else {
-//            // we didn't find the employee
-//            throw new RuntimeException("Did not find employee id - " + theId);
-//        }
-//        return post;
-//    }
+    
 }

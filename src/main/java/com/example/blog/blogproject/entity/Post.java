@@ -97,7 +97,7 @@ public class Post {
         this.content = content;
     }
 
-    public boolean isPublished() {
+    public Boolean isPublished() {
         return isPublished;
     }
 
@@ -134,7 +134,7 @@ public class Post {
     }
 
     public void setAuthor(User authors) {
-        System.out.println("author="+authors);
+
         this.author = authors;
     }
 
@@ -170,7 +170,6 @@ public class Post {
 
     public void setTagsList(List<Tags> tags)
     {
-        this.tags = null;
         this.tags = tags;
     }
 

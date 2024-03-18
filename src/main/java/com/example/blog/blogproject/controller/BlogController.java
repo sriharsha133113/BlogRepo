@@ -32,10 +32,6 @@ public class BlogController {
     @GetMapping("/createpost")
     public  String createPost(Model theModel){
         Post thepost=new Post();
-        User theuser=new User("user2","email2","password2");
-        thepost.setAuthor(theuser);
-        System.out.println(theuser);
-        userService.save(theuser);
         thepost.setCreatedAt(LocalDateTime.now());
         theModel.addAttribute("post",thepost);
         return "create_post";
@@ -44,19 +40,24 @@ public class BlogController {
 
 
     @PostMapping("/savepost")
-    public String savePost(@ModelAttribute("post") Post post, @RequestParam("tags") String tags) {
-
-
-        post.setPublishedAt(LocalDateTime.now());
-        List<Tags> tag=postService.checkedForTags(post.getNormalTags());
-        // post.setAuthor(userService.FindUser());
+    public String savePost(@ModelAttribute("post") Post post) {
+        List<Tags> tag = postService.checkedForTags(post.getNormalTags());
         post.setTagsList(tag);
-        User theuser=new User("user2","email2","password2");
-        post.setAuthor(theuser);
-        postService.save(post);
 
+        if (!post.isPublished()) {
+
+            post.setPublished(true);
+            post.setPublishedAt(LocalDateTime.now());
+            User theuser = new User("user2", "email2", "password2");
+            post.setAuthor(theuser);
+        } else {
+
+            post.setUpdatedAt(LocalDateTime.now());
+        }
+        postService.save(post);
         return "redirect:/blog/getposts";
     }
+
 
     @GetMapping("/getposts")
     public String getAllPosts(Model model) {
@@ -69,7 +70,6 @@ public class BlogController {
                 post.setExcerpt(content);
             }
         }
-
         model.addAttribute("posts", posts);
         return "get_posts";
     }
@@ -90,12 +90,23 @@ public class BlogController {
     public String updateForms(@RequestParam("formId") int theId,Model themodel){
 
         Post thepost = postService.findById(theId);
-
         themodel.addAttribute("post",thepost);
-        return "create_post";
+        return "update_post";
 
     }
 
+    @PostMapping("/updatePost")
+    public String updatePost(@ModelAttribute("post") Post updatedPost) {
+
+        Post existingPost = postService.findById(updatedPost.getId());
+        existingPost.setTitle(updatedPost.getTitle());
+        existingPost.setContent(updatedPost.getContent());
+        List<Tags> updatedTags = postService.checkedForTags(updatedPost.getNormalTags());
+        existingPost.setTagsList(updatedTags);
+        existingPost.setUpdatedAt(LocalDateTime.now());
+        postService.save(existingPost);
+        return "redirect:/blog/getposts";
+    }
 
     @GetMapping("/deleteForm")
     public String deleteForms(@RequestParam("formId") int theId,Model themodel){
@@ -103,11 +114,9 @@ public class BlogController {
         Post thepost = postService.findById(theId);
         System.out.println("post delete form"+theId);
         postService.deletePost(thepost);
-
         return "redirect:/blog/getposts";
 
     }
-
 
 
     @GetMapping("/sort")
@@ -121,14 +130,14 @@ public class BlogController {
             List<Post> oldestPosts = postService.getOldestPosts();
             model.addAttribute("posts", oldestPosts);
         }
-        return "get_posts"; // Assuming "get_posts" is your view name for displaying posts
+        return "get_posts";
     }
 
     @PostMapping("/search")
     public String searchPosts(@RequestParam("query") String query, Model model) {
         List<Post> searchResults = postService.searchPosts(query);
         model.addAttribute("posts", searchResults);
-        return "get_posts"; // Create a new Thymeleaf template for displaying search results
+        return "get_posts";
     }
 
 
@@ -143,19 +152,15 @@ public class BlogController {
         currentPost.addComment(currentComment);
         postService.save(currentPost);
         themodel.addAttribute("post", currentPost);
-
-
         return "personal_post";
 
     }
-
 
     @GetMapping("/updateComment")
     public String updateComment(@RequestParam("commentId") int theId,Model themodel){
 
         Comments comment = commentService.findById(theId);
         themodel.addAttribute("commentId",comment.getId());
-
         themodel.addAttribute("commentcontent",comment.getComment());
         return "update_comment_form";
 
@@ -165,26 +170,17 @@ public class BlogController {
     public String saveUpdatedComment(@RequestParam("presentcommentId") int theId,@RequestParam("presentcomment") String thecomment){
 
         Comments comment = commentService.findById(theId);
-
         comment.setUpdatedAt(LocalDateTime.now());
         comment.setComment(thecomment);
-
         commentService.save(comment);
-
         return "redirect:/blog/getposts";
     }
-
-
-
-
 
     @GetMapping("/deleteComment")
     public String deleteComment(@RequestParam("commentId") int commentId) {
         commentService.deleteComment(commentId);
         return "redirect:/blog/getposts";
     }
-
-
 
 
 }

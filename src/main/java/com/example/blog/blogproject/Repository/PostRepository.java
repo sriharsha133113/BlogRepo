@@ -12,7 +12,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
 
     List<Post> findByTitleContainingOrContentContainingOrTagsNameContaining(String title, String content, String tagName);
 
-//    Post findById(int theId);
+
 
 
 }
