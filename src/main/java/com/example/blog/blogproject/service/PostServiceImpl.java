@@ -93,4 +93,40 @@ public class PostServiceImpl implements  PostService {
         return postRepository.findByTitleContainingOrContentContainingOrTagsNameContaining(query, query, query);
     }
 
+    @Override
+    public List<Post> searchPostsByAuthor(String query) {
+        return postRepository.findByAuthorName(query);
+    }
+
+    @Override
+    public List<Post> getPostsByAuthors(List<Integer> authorIds) {
+        return postRepository.findByAuthorIdIn(authorIds);
+    }
+
+    @Override
+    public List<Post> getPostsByTags(List<Integer> tagIds) {
+        return postRepository.findByTagsIdIn(tagIds);
+    }
+
+    @Override
+    public List<Post> findByTagsAndAuthors(List<String> selectedTags, List<String> selectedAuthors) {
+        return postRepository.findByTagsInAndAuthorIn(selectedTags, selectedAuthors);
+    }
+
+
+
+    @Override
+    public List<Post> searchPostsByAuthorsAndTags(List<String> authors, List<String> tags) {
+        if (authors == null && tags == null) {
+            return postRepository.findAll(); // Get all posts if no filters applied
+        } else if (authors != null && tags != null) {
+            return postRepository.findByAuthorNameInAndTagsNameIn(authors, tags);
+        } else if (authors != null) {
+            return postRepository.findByAuthorNameIn(authors);
+        } else {
+            return postRepository.findByTagsNameIn(tags);
+        }
+    }
+
+
 }

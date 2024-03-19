@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -52,7 +53,97 @@
         </form>
     </div>
     <div class="container">
-        <!-- Posts -->
+        <div th:each="post : ${posts}">
+            <a th:href="@{'/blog/readForm?formId=' + ${post.id}}">
+                <div class="box post-box">
+                    <h2 th:text="${post.title}"></h2>
+                    <p th:text="${post.author?.name}"></p>
+                    <p th:text="${post.publishedAt}"></p>
+                    <p th:text="${post.excerpt}"></p>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+-->
+
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Posts</title>
+    <link rel="stylesheet" type="text/css" href="/get_posts.css">
+    <style>
+        .post-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .post-content {
+            display: none;
+        }
+        .formsearch {
+            margin-bottom: 20px;
+        }
+        .formsearch input[type="text"] {
+            padding: 5px;
+            width: 200px;
+        }
+        .formsearch button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <h1>List of Posts</h1>
+    <div class="formsearch">
+        <form th:action="@{/blog/search}" method="post">
+            <input type="text" name="query" placeholder="Search...">
+            <input type="hidden" name="sort" value="latest">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <div class="formsort">
+        <form th:action="@{/blog/sort}" method="get">
+            <label for="sort">Sort By:</label>
+            <select id="sort" name="sort">
+                <option value="latest">Latest</option>
+                <option value="oldest">Oldest</option>
+            </select>
+            <input type="hidden" name="query" th:value="${param.query != null} ? ${param.query} : ''" />
+            <button type="submit">Sort</button>
+        </form>
+    </div>
+
+    <form th:action="@{/blog/filter}" method="post">
+      <div class="filter-authors">
+            <label>Filter by Author:</label>
+            <div th:each="authorName : ${authors}">
+                <input type="checkbox" id="author_${authorName}" name="author" th:value="${authorName}">
+                <label th:for="'author_' + ${authorName}" th:text="${authorName}"></label>
+            </div>
+      </div>
+      <div class="filter-tags">
+        <label>Filter by Tags:</label>
+        <div th:each="tag : ${tags}">
+            <input type="checkbox" id="tag_${tag.id}" name="taglist" th:value="${tag.name}">
+            <label th:for="'tag_' + ${tag.id}" th:text="${tag.name}"></label>
+        </div>
+      </div>
+    <button type="submit">Apply Filters</button>
+    </form>
+
+    <div class="container">
         <div th:each="post : ${posts}">
             <a th:href="@{'/blog/readForm?formId=' + ${post.id}}">
                 <div class="box post-box">

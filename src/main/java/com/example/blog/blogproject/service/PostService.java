@@ -3,6 +3,7 @@ package com.example.blog.blogproject.service;
 import com.example.blog.blogproject.entity.Post;
 import com.example.blog.blogproject.entity.Tags;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface PostService {
@@ -26,4 +27,14 @@ public interface PostService {
     List<Post> getOldestPosts();
 
     List<Post> searchPosts(String query);
+
+    List<Post> searchPostsByAuthor(String query);
+
+    List<Post> getPostsByAuthors(List<Integer> authorIds);
+    List<Post> getPostsByTags(List<Integer> tagIds);
+
+
+    List<Post> findByTagsAndAuthors(List<String> selectedTags, List<String> selectedAuthors);
+
+    List<Post> searchPostsByAuthorsAndTags(List<String> authors, List<String> tags);
 }

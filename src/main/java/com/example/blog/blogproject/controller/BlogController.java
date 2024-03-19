@@ -6,6 +6,7 @@ import com.example.blog.blogproject.entity.Tags;
 import com.example.blog.blogproject.entity.User;
 import com.example.blog.blogproject.service.CommentService;
 import com.example.blog.blogproject.service.PostService;
+import com.example.blog.blogproject.service.TagService;
 import com.example.blog.blogproject.service.UserService;
 import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +15,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/blog")
@@ -29,6 +29,9 @@ public class BlogController {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private TagService tagService;
 
     @GetMapping("/createpost")
     public  String createPost(Model theModel){
@@ -45,10 +48,9 @@ public class BlogController {
         post.setTagsList(tag);
 
         if (!post.isPublished()) {
-
             post.setPublished(true);
             post.setPublishedAt(LocalDateTime.now());
-            User theuser = new User("user2", "email2", "password2");
+            User theuser = new User("user1", "email1", "password1");
             post.setAuthor(theuser);
         } else {
 
@@ -57,6 +59,7 @@ public class BlogController {
         postService.save(post);
         return "redirect:/blog/getposts";
     }
+
 
     @GetMapping("/getposts")
     public String getAllPosts(Model model) {
@@ -69,7 +72,18 @@ public class BlogController {
                 post.setExcerpt(content);
             }
         }
+        List<Tags> tags = tagService.getAllTags();
+        Set<String> uniqueAuthorNames = new HashSet<>();
+        List<User> authors = userService.getAllUsers();
+        for (User author : authors) {
+            uniqueAuthorNames.add(author.getName());
+        }
+        List<String> authorNames = new ArrayList<>(uniqueAuthorNames);
+//        List<User> authors = userService.getAllUsers();
         model.addAttribute("posts", posts);
+        model.addAttribute("authors", authorNames);
+        model.addAttribute("tags", tags);
+
         return "get_posts";
     }
 
@@ -84,7 +98,6 @@ public class BlogController {
 
     }
 
-
     @GetMapping("/updateForm")
     public String updateForms(@RequestParam("formId") int theId,Model themodel){
 
@@ -93,6 +106,7 @@ public class BlogController {
         return "update_post";
 
     }
+
 
     @PostMapping("/updatePost")
     public String updatePost(@ModelAttribute("post") Post updatedPost) {
@@ -117,19 +131,6 @@ public class BlogController {
 
     }
 
-//    @GetMapping("/sort")
-//    public String sortPosts(@RequestParam("sort") String sortType, Model model) {
-//        if ("latest".equals(sortType)) {
-//
-//            List<Post> latestPosts = postService.getLatestPosts();
-//            model.addAttribute("posts", latestPosts);
-//        } else if ("oldest".equals(sortType)) {
-//
-//            List<Post> oldestPosts = postService.getOldestPosts();
-//            model.addAttribute("posts", oldestPosts);
-//        }
-//        return "get_posts";
-//    }
 
     @GetMapping("/sort")
     public String sortPosts(@RequestParam("sort") String sortType, @RequestParam("query") String query, Model model) {
@@ -143,28 +144,25 @@ public class BlogController {
         return "get_posts";
     }
 
-
-
     @PostMapping("/search")
     public String searchPosts(@RequestParam("query") String query, Model model) {
         List<Post> searchResults = postService.searchPosts(query);
         model.addAttribute("posts", searchResults);
+
+        List<Tags> tags = tagService.getAllTags();
+        Set<String> uniqueAuthorNames = new HashSet<>();
+        List<User> authors = userService.getAllUsers();
+        for (User author : authors) {
+            uniqueAuthorNames.add(author.getName());
+        }
+        List<String> authorNames = new ArrayList<>(uniqueAuthorNames);
+        model.addAttribute("authors", authorNames);
+        model.addAttribute("tags", tags);
+
         return "get_posts";
     }
 
 
-//    @PostMapping("/search")
-//    public String searchPosts(@RequestParam(value = "query") String query, @RequestParam(value = "sort", defaultValue = "latest") String sortType, Model model) {
-//        List<Post> searchResults = postService.searchPosts(query);
-//        if ("latest".equals(sortType)) {
-//            Collections.sort(searchResults, Comparator.comparing(Post::getPublishedAt).reversed());
-//        } else if ("oldest".equals(sortType)) {
-//            Collections.sort(searchResults, Comparator.comparing(Post::getPublishedAt));
-//        }
-//        model.addAttribute("posts", searchResults);
-//        return "get_posts";
-//    }
-//
     @PostMapping("/addComments")
     public String addComments(Model themodel,@ModelAttribute("post")Post thepost,@ModelAttribute("comments")Comments thecomment){
         Post currentPost = postService.findById(thepost.getId());
@@ -206,5 +204,53 @@ public class BlogController {
         return "redirect:/blog/getposts";
     }
 
+//    @PostMapping("/filter")
+//    public String filterPosts(@RequestParam(value = "taglist", required = false) List<String> selectedTags,@RequestParam(value = "author", required = false) List<String> selectedAuthors,
+//                              Model model) {
+//
+//        Set<Post> filteredPosts = new HashSet<>();
+//        if (selectedAuthors != null && !selectedAuthors.isEmpty()) {
+//            for(String tag : selectedAuthors) {
+//                List<Post> postsForAuthors = postService.searchPostsByAuthor(tag);
+//                filteredPosts.addAll(postsForAuthors);
+//            }
+//        }
+//        if (selectedTags != null && !selectedTags.isEmpty()) {
+//
+//            for(String tag : selectedTags) {
+//                List<Post> postsForTags = postService.searchPosts(tag);
+//                filteredPosts.addAll(postsForTags);
+//            }
+//
+//        }
+//        if (selectedAuthors == null && selectedTags == null) {
+//
+//            filteredPosts.addAll(postService.getAllPosts());
+//        }
+//        model.addAttribute("posts", new ArrayList<>(filteredPosts));
+//        return "get_posts";
+//    }
+
+    @PostMapping("/filter")
+    public String filterPosts(@RequestParam(value = "taglist", required = false) List<String> selectedTags,
+                              @RequestParam(value = "author", required = false) List<String> selectedAuthors,
+                              Model model) {
+        List<Post> filteredPosts = postService.searchPostsByAuthorsAndTags(selectedAuthors, selectedTags);
+        model.addAttribute("posts", filteredPosts);
+
+        List<Tags> tags = tagService.getAllTags();
+        Set<String> uniqueAuthorNames = new HashSet<>();
+        List<User> authors = userService.getAllUsers();
+        for (User author : authors) {
+            uniqueAuthorNames.add(author.getName());
+        }
+        List<String> authorNames = new ArrayList<>(uniqueAuthorNames);
+        model.addAttribute("authors", authorNames);
+        model.addAttribute("tags", tags);
+
+        return "get_posts";
+    }
+
 
 }
+

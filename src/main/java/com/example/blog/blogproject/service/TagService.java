@@ -2,6 +2,7 @@ package com.example.blog.blogproject.service;
 
 import com.example.blog.blogproject.entity.Tags;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TagService {
@@ -10,5 +11,8 @@ public interface TagService {
     void saveTag(Tags tag);
 
     Optional<Tags> findByName(String name);
+
+    List<Tags> getAllTags();
+
 
 }
