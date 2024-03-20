@@ -3,6 +3,7 @@ package com.example.blog.blogproject.service;
 import com.example.blog.blogproject.entity.Post;
 import com.example.blog.blogproject.entity.Tags;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,4 +38,7 @@ public interface PostService {
     List<Post> findByTagsAndAuthors(List<String> selectedTags, List<String> selectedAuthors);
 
     List<Post> searchPostsByAuthorsAndTags(List<String> authors, List<String> tags);
+
+    List<Post> filterAndSearchPosts(String query, List<String> authors, List<String> tags, LocalDateTime startDateTime, LocalDateTime endDateTime);
+
 }

@@ -35,12 +35,9 @@ public class PostServiceImpl implements  PostService {
         postRepository.save(thePost);
     }
 
-
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }
-
-
 
     public List<Tags> checkedForTags(List<Tags> tags) {
         List<Tags> newTags = new ArrayList<>();
@@ -114,11 +111,10 @@ public class PostServiceImpl implements  PostService {
     }
 
 
-
     @Override
     public List<Post> searchPostsByAuthorsAndTags(List<String> authors, List<String> tags) {
         if (authors == null && tags == null) {
-            return postRepository.findAll(); // Get all posts if no filters applied
+            return postRepository.findAll();
         } else if (authors != null && tags != null) {
             return postRepository.findByAuthorNameInAndTagsNameIn(authors, tags);
         } else if (authors != null) {
@@ -126,6 +122,11 @@ public class PostServiceImpl implements  PostService {
         } else {
             return postRepository.findByTagsNameIn(tags);
         }
+    }
+
+    @Override
+    public List<Post> filterAndSearchPosts(String query, List<String> authors, List<String> tags, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        return postRepository.filterAndSearchPosts(query, authors, tags,startDateTime,endDateTime);
     }
 
 
