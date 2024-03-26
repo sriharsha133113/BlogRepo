@@ -40,6 +40,7 @@ public class BlogRestController {
     @PostMapping("/posts")
     public ResponseEntity<String> saveNewPost(@RequestBody Post post){
 
+
             if (!post.isPublished()) {
                 post.setPublished(true);
                 post.setPublishedAt(LocalDateTime.now());
@@ -51,11 +52,11 @@ public class BlogRestController {
             postService.save(post);
             return new ResponseEntity<>("New Post added successfully", HttpStatus.CREATED);
         }
-    }
 
     @GetMapping("/posts")
     public ResponseEntity<List<Post>> showAllPosts(){
 
+//        PostService postService;
         List<Post> posts= postService.getAllPosts();
 
         return new ResponseEntity<>(posts, HttpStatus.OK);
@@ -115,7 +116,6 @@ public class BlogRestController {
 
         return new ResponseEntity<>("Access Denied",HttpStatus.UNAUTHORIZED);
     }
-
 
 
 }
