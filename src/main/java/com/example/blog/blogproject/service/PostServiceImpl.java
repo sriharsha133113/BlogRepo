@@ -5,6 +5,11 @@ import com.example.blog.blogproject.entity.Post;
 import com.example.blog.blogproject.entity.Tags;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -90,6 +95,7 @@ public class PostServiceImpl implements  PostService {
         return postRepository.findByTitleContainingOrContentContainingOrTagsNameContaining(query, query, query);
     }
 
+
     @Override
     public List<Post> searchPostsByAuthor(String query) {
         return postRepository.findByAuthorName(query);
@@ -110,7 +116,6 @@ public class PostServiceImpl implements  PostService {
         return postRepository.findByTagsInAndAuthorIn(selectedTags, selectedAuthors);
     }
 
-
     @Override
     public List<Post> searchPostsByAuthorsAndTags(List<String> authors, List<String> tags) {
         if (authors == null && tags == null) {
@@ -124,9 +129,55 @@ public class PostServiceImpl implements  PostService {
         }
     }
 
+
+//    @Override
+//    public List<Post> filterAndSearchPosts(String query, List<String> authors, List<String> tags, LocalDateTime startDateTime, LocalDateTime endDateTime,String sortType) {
+//        return postRepository.filterAndSearchPosts(query, authors, tags,startDateTime,endDateTime,sortType);
+//    }
+
     @Override
-    public List<Post> filterAndSearchPosts(String query, List<String> authors, List<String> tags, LocalDateTime startDateTime, LocalDateTime endDateTime) {
-        return postRepository.filterAndSearchPosts(query, authors, tags,startDateTime,endDateTime);
+    public Page<Post> filterAndSearchPosts(String query, List<String> selectedAuthors, List<String> selectedTags, LocalDateTime startDateTime, LocalDateTime endDateTime, String sort, int pageNo, int pageSize)
+    {
+        Pageable pageable = null;
+        if(sort.equals("latest"))
+        {
+            pageable= PageRequest.of(pageNo-1,pageSize, Sort.by("publishedAt").descending());
+        }
+        else{
+        pageable= PageRequest.of(pageNo-1,pageSize, Sort.by("publishedAt").ascending());
+        }
+
+        return postRepository.filterAndSearchPosts(query, selectedAuthors, selectedTags, startDateTime, endDateTime, pageable);
+    }
+
+    @Override
+    public Page<Post> getAllPosts(int pageNo, int pageSize){
+        Pageable pageable= PageRequest.of(pageNo-1,pageSize);
+        return postRepository.findAll(pageable);
+
+    }
+
+    @Override
+    public boolean isUserAuthorized(UserDetails userDetails, Integer postId){
+        Optional<Post> result = postRepository.findById(postId);
+        Post post = null;
+
+        if (result.isPresent()) {
+            post = result.get();
+        }
+
+        boolean isAuthorized = false;
+
+        if( userDetails==null){
+            return false;
+        }
+        else if(userDetails.getAuthorities().toString().contains("ROLE_ADMIN")){
+            isAuthorized = true;
+        } else if (userDetails.getUsername().equals(post.getAuthor())) {
+            isAuthorized = true;
+        }
+
+        return isAuthorized;
     }
 
 

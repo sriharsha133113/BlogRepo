@@ -1,4 +1,4 @@
-.container{
+/*.container{
 
    display:grid;
    row-gap:20px;
@@ -35,6 +35,82 @@ position:absolute;
 top:90px;
 right:50px;
 
+}*/
+
+
+
+
+
+
+.container {
+    display: grid;
+    row-gap: 20px;
+    column-gap: 20px;
+    grid-template-columns: 500px 500px;
+    grid-auto-rows: 400px;
+    text-align: center;
+    padding-left: 100px;
 }
 
+.box {
+    border: 2px solid black;
+}
+
+.main {
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.formsort {
+    position: absolute;
+    top: 40px;
+    right: 30px;
+}
+
+.formfilter {
+    position: absolute;
+    top: 90px;
+    right: 50px;
+}
+
+.pagination {
+    margin-top: 20px;
+}
+
+.pagination .row {
+    display: flex;
+    justify-content: center;
+}
+
+.pagination .page-links {
+    margin-top: 10px;
+}
+
+.pagination form {
+    display: inline;
+    margin-right: 5px;
+
+}
+
+.pagination form input[type="submit"],
+.pagination form .current-page {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.pagination form input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.pagination form .current-page {
+    background-color: #ccc;
+}
 

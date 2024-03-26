@@ -1,13 +1,12 @@
 package com.example.blog.blogproject.service;
 
 import com.example.blog.blogproject.Repository.CommentRepository;
-import com.example.blog.blogproject.Repository.UserRepository;
 import com.example.blog.blogproject.entity.Comments;
-import com.example.blog.blogproject.entity.Post;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +44,9 @@ public class CommentServiceImpl implements CommentService {
 
     }
 
-    
+    @Override
+    public List<Comments> findAll() {
+        return commentRepository.findAll();
+    }
+
 }

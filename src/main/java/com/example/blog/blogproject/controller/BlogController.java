@@ -1,5 +1,6 @@
 package com.example.blog.blogproject.controller;
 
+import com.example.blog.blogproject.Repository.UserRepository;
 import com.example.blog.blogproject.entity.Comments;
 import com.example.blog.blogproject.entity.Post;
 import com.example.blog.blogproject.entity.Tags;
@@ -10,6 +11,9 @@ import com.example.blog.blogproject.service.TagService;
 import com.example.blog.blogproject.service.UserService;
 import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +37,15 @@ public class BlogController {
 
     @Autowired
     private TagService tagService;
+    @Autowired
+    private UserRepository userRepository;
+
+    @GetMapping("/")
+    public  String viewHomePage(Model model){
+
+        return  getPostsAndFilter(null,null,null,null,null,null,1,model);
+
+    }
 
     @GetMapping("/createpost")
     public  String createPost(Model theModel){
@@ -44,58 +57,37 @@ public class BlogController {
     }
 
     @PostMapping("/savepost")
-    public String savePost(@ModelAttribute("post") Post post) {
+    public String savePost(@ModelAttribute("post") Post post,@AuthenticationPrincipal UserDetails userDetails) {
         List<Tags> tag = postService.checkedForTags(post.getNormalTags());
         post.setTagsList(tag);
 
         if (!post.isPublished()) {
             post.setPublished(true);
             post.setPublishedAt(LocalDateTime.now());
-            User theuser = new User("user1", "email1", "password1");
+            User theuser = userRepository.findUserByName(userDetails.getUsername());
             post.setAuthor(theuser);
         } else {
 
             post.setUpdatedAt(LocalDateTime.now());
         }
         postService.save(post);
-        return "redirect:/blog/getposts";
-    }
-
-    @GetMapping("/getposts")
-    public String getAllPosts(Model model) {
-        List<Post> posts = postService.getAllPosts();
-        for (Post post : posts) {
-            String content = post.getContent();
-            if (content != null && content.length() >= 5) {
-                post.setExcerpt(content.substring(0, 5));
-            } else {
-                post.setExcerpt(content);
-            }
-        }
-        List<Tags> tags = tagService.getAllTags();
-        Set<String> uniqueAuthorNames = new HashSet<>();
-        List<User> authors = userService.getAllUsers();
-        for (User author : authors) {
-            uniqueAuthorNames.add(author.getName());
-        }
-        List<String> authorNames = new ArrayList<>(uniqueAuthorNames);
-//        List<User> authors = userService.getAllUsers();
-        model.addAttribute("posts", posts);
-        model.addAttribute("authors", authorNames);
-        model.addAttribute("tags", tags);
-
-        return "get_posts";
+        return "redirect:/blog/";
     }
 
     @GetMapping("/readForm")
-    public String readForms(@RequestParam("formId") int theId,Model themodel){
+    public String readForms(@RequestParam("formId") int theId, Model themodel, @AuthenticationPrincipal UserDetails userDetails){
 
         Post thepost = postService.findById(theId);
         Comments thecomment = new Comments();
         themodel.addAttribute("comments",thecomment);
         themodel.addAttribute("post",thepost);
-        return "personal_post";
+        if(userDetails!=null){
+            themodel.addAttribute("currentUser",userDetails.getUsername());
+        }else{
+            themodel.addAttribute("currentUser","null");
+        }
 
+        return "personal_post";
     }
 
     @GetMapping("/updateForm")
@@ -107,7 +99,6 @@ public class BlogController {
 
     }
 
-
     @PostMapping("/updatePost")
     public String updatePost(@ModelAttribute("post") Post updatedPost) {
 
@@ -118,7 +109,7 @@ public class BlogController {
         existingPost.setTagsList(updatedTags);
         existingPost.setUpdatedAt(LocalDateTime.now());
         postService.save(existingPost);
-        return "redirect:/blog/getposts";
+        return "redirect:/blog/";
     }
 
     @GetMapping("/deleteForm")
@@ -127,20 +118,41 @@ public class BlogController {
         Post thepost = postService.findById(theId);
         System.out.println("post delete form"+theId);
         postService.deletePost(thepost);
-        return "redirect:/blog/getposts";
+        return "redirect:/blog/";
 
     }
 
+    @RequestMapping(value = {
+            "/filter/{pageNo}"}, method = {RequestMethod.GET})
+    public String getPostsAndFilter(@RequestParam(value = "query", required = false) String query,
+                                    @RequestParam(value = "author", required = false) List<String> selectedAuthors,
+                                    @RequestParam(value = "taglist", required = false) List<String> selectedTags,
+                                    @RequestParam(value = "startDateTime", required = false) LocalDateTime startDateTime,
+                                    @RequestParam(value = "endDateTime", required = false) LocalDateTime endDateTime,
+                                    @RequestParam(value = "sort", defaultValue = "oldest") String sort,
+                                    @PathVariable("pageNo") int pageNo,
+                                    Model model) {
 
-    @GetMapping("/sort")
-    public String sortPosts(@RequestParam("sort") String sortType, @RequestParam("query") String query, Model model) {
-        List<Post> filteredPosts = postService.searchPosts(query);
-        if ("latest".equals(sortType)) {
-            Collections.sort(filteredPosts, Comparator.comparing(Post::getPublishedAt).reversed());
-        } else if ("oldest".equals(sortType)) {
-            Collections.sort(filteredPosts, Comparator.comparing(Post::getPublishedAt));
+        int pageSize=2;
+        Page<Post> pageposts = null;
+        if (query != null || selectedAuthors != null || selectedTags != null || startDateTime != null || endDateTime != null) {
+
+            pageposts = postService.filterAndSearchPosts(query, selectedAuthors, selectedTags, startDateTime, endDateTime, sort, pageNo, pageSize);
+        } else {
+
+            pageposts = postService.getAllPosts(pageNo, 10);
         }
-        model.addAttribute("posts", filteredPosts);
+
+        List<Post> posts=pageposts.getContent();
+
+        for (Post post : posts) {
+            String content = post.getContent();
+            if (content != null && content.length() >= 5) {
+                post.setExcerpt(content.substring(0, 5));
+            } else {
+                post.setExcerpt(content);
+            }
+        }
 
         List<Tags> tags = tagService.getAllTags();
         Set<String> uniqueAuthorNames = new HashSet<>();
@@ -149,98 +161,20 @@ public class BlogController {
             uniqueAuthorNames.add(author.getName());
         }
         List<String> authorNames = new ArrayList<>(uniqueAuthorNames);
+
+        model.addAttribute("posts", posts);
         model.addAttribute("authors", authorNames);
         model.addAttribute("tags", tags);
+        model.addAttribute("sort",sort);
 
-        return "get_posts";
-    }
-
-    @PostMapping("/search")
-    public String searchPosts(@RequestParam("query") String query, Model model) {
-        List<Post> searchResults = postService.searchPosts(query);
-        model.addAttribute("posts", searchResults);
-
-        List<Tags> tags = tagService.getAllTags();
-        Set<String> uniqueAuthorNames = new HashSet<>();
-        List<User> authors = userService.getAllUsers();
-        for (User author : authors) {
-            uniqueAuthorNames.add(author.getName());
-        }
-        List<String> authorNames = new ArrayList<>(uniqueAuthorNames);
-        model.addAttribute("authors", authorNames);
-        model.addAttribute("tags", tags);
+        model.addAttribute("totalPages", pageposts.getTotalPages());
+        model.addAttribute("totalItems", pageposts.getTotalElements());
+        model.addAttribute("currentPage", pageNo);
 
         return "get_posts";
     }
 
 
-    @PostMapping("/addComments")
-    public String addComments(Model themodel,@ModelAttribute("post")Post thepost,@ModelAttribute("comments")Comments thecomment){
-        Post currentPost = postService.findById(thepost.getId());
-        Comments currentComment = new Comments();
-        currentComment.setComment(thecomment.getComment());
-        currentComment.setName(currentPost.getAuthor().getName());
-        currentComment.setEmail(currentPost.getAuthor().getEmail());
-        currentComment.setCreatedAt(LocalDateTime.now());
-        currentPost.addComment(currentComment);
-        postService.save(currentPost);
-        themodel.addAttribute("post", currentPost);
-        return "personal_post";
-
-    }
-
-    @GetMapping("/updateComment")
-    public String updateComment(@RequestParam("commentId") int theId,Model themodel){
-
-        Comments comment = commentService.findById(theId);
-        themodel.addAttribute("commentId",comment.getId());
-        themodel.addAttribute("commentcontent",comment.getComment());
-        return "update_comment_form";
-
-    }
-
-    @PostMapping("/saveupdateComment")
-    public String saveUpdatedComment(@RequestParam("presentcommentId") int theId,@RequestParam("presentcomment") String thecomment){
-
-        Comments comment = commentService.findById(theId);
-        comment.setUpdatedAt(LocalDateTime.now());
-        comment.setComment(thecomment);
-        commentService.save(comment);
-        return "redirect:/blog/getposts";
-    }
-
-    @GetMapping("/deleteComment")
-    public String deleteComment(@RequestParam("commentId") int commentId) {
-        commentService.deleteComment(commentId);
-        return "redirect:/blog/getposts";
-    }
-
-
-@PostMapping("/filter")
-public String filterAndSearchPosts(@RequestParam(value = "query", required = false) String query,
-                                   @RequestParam(value = "author", required = false) List<String> selectedAuthors,
-                                   @RequestParam(value = "taglist", required = false) List<String> selectedTags,
-                                   @RequestParam(value = "startDateTime", required = false) LocalDateTime startDateTime,
-                                   @RequestParam(value = "endDateTime", required = false) LocalDateTime endDateTime,
-                                   Model model) {
-
-    List<Post> filteredPosts = postService.filterAndSearchPosts(query, selectedAuthors, selectedTags, startDateTime, endDateTime);
-
-    List<Tags> tags = tagService.getAllTags();
-        Set<String> uniqueAuthorNames = new HashSet<>();
-        List<User> authors = userService.getAllUsers();
-        for (User author : authors) {
-            uniqueAuthorNames.add(author.getName());
-        }
-        List<String> authorNames = new ArrayList<>(uniqueAuthorNames);
-        model.addAttribute("authors", authorNames);
-        model.addAttribute("tags", tags);
-
-    model.addAttribute("posts", filteredPosts);
-    return "get_posts";
 }
-
-}
-
 
 

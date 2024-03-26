@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"  xmlns:sec="http://thymeleaf.org/extras/spring-security" >
 <head>
     <meta charset="UTF-8">
     <title>List of Posts</title>
@@ -28,31 +28,38 @@
             border: none;
             cursor: pointer;
         }
+        .a{
+          display:none;
+        }
     </style>
 </head>
 <body>
 <div class="main">
     <h1>List of Posts</h1>
     <div class="formsearch">
-        <form th:action="@{/blog/search}" method="post">
+        <form th:action="@{'/blog/filter/'+1}" method="get">
             <input type="text" name="query" placeholder="Search...">
-            <input type="hidden" name="sort" value="latest">
             <button type="submit">Search</button>
         </form>
     </div>
     <div class="formsort">
-        <form th:action="@{/blog/sort}" method="get">
+        <form th:action="@{'/blog/filter/'+1}" method="get">
             <label for="sort">Sort By:</label>
             <select id="sort" name="sort">
                 <option value="latest">Latest</option>
-                <option value="oldest">Oldest</option>
+                <option value="oldest" selected>Oldest</option>
             </select>
-            <input type="hidden" name="query" th:value="${param.query != null} ? ${param.query} : ''" />
+            <input type="hidden" name="query" th:value="${param.query}" />
+            <input type="hidden" name="author" th:each="selectedAuthor : ${param.author}" th:value="${selectedAuthor}" />
+            <input type="hidden" name="taglist" th:each="selectedTag : ${param.taglist}" th:value="${selectedTag}" />
+            <input type="hidden" name="startDateTime" th:value="${param.startDateTime}" />
+            <input type="hidden" name="endDateTime" th:value="${param.endDateTime}" />
+
             <button type="submit">Sort</button>
         </form>
     </div>
 
-    <form th:action="@{/blog/filter}" method="post" class="formfilter">
+    <form th:action="@{'/blog/filter/'+1}" method="get" class="formfilter">
       <div class="filter-authors">
             <label>Filter by Author:</label>
             <div th:each="authorName : ${authors}">
@@ -67,7 +74,8 @@
             <label th:for="'tag_' + ${tag.id}" th:text="${tag.name}"></label>
         </div>
       </div><br>
-        <input type="hidden" name="query" th:value="${param.query != null} ? ${param.query} : ''" />
+        <input type="hidden" name="query" th:value="${query}" />
+        <input type="hidden" name="sort" th:value="${sort}" />
         <label for="startDateTime">Start Date and Time:</label>
         <input type="datetime-local" id="startDateTime" name="startDateTime"><br><br>
 
@@ -88,7 +96,66 @@
                 </div>
             </a>
         </div>
+
+
     </div>
+    <div>
+
+        <div sec:authorize="hasAnyRole('AUTHOR', 'ADMIN')">
+            <a th:href="@{/blog/createpost}">
+                <button>Create Post</button>
+            </a>
+        </div><br>
+        <div>
+            <a th:href="@{/blog/createpost}">
+                <button>Login to Create Post</button>
+            </a>
+        </div><br>
+
+        <form th:action="@{/logout}" method="POST">
+            <input type="submit" value="Logout" />
+        </form>
+
+    </div>
+
+    <div class="pagination" th:if="${totalPages > 1}">
+        <div class="row">
+
+            <div class="col">
+                <form th:action="@{'/blog/filter/' + ${currentPage - 1}}" class="prev-page" th:if="${currentPage > 1}" method="get">
+
+                    <input type="hidden" name="query" th:value="${query}" />
+                    <input type="hidden" name="author" th:each="selectedAuthor : ${param.author}" th:value="${selectedAuthor}" />
+                    <input type="hidden" name="taglist" th:each="selectedTag : ${param.taglist}" th:value="${selectedTag}" />
+                    <input type="hidden" name="startDateTime" th:value="${startDateTime}" />
+                    <input type="hidden" name="endDateTime" th:value="${endDateTime}" />
+                    <input type="hidden" name="sort" th:value="${sort}" />
+
+                    <button type="submit">Previous</button>
+                </form>
+            </div>
+
+            <div class="col">
+                <form th:if="${currentPage < totalPages}"  th:action="@{'/blog/filter/' + ${currentPage + 1}}" class="next-page"  method="get">
+
+                    <input type="hidden" name="query" th:value="${query}" />
+                    <input type="hidden" name="author" th:each="selectedAuthor : ${param.author}" th:value="${selectedAuthor}" />
+                    <input type="hidden" name="taglist" th:each="selectedTag : ${param.taglist}" th:value="${selectedTag}" />
+                    <input type="hidden" name="startDateTime" th:value="${startDateTime}" />
+                    <input type="hidden" name="endDateTime" th:value="${endDateTime}" />
+                    <input type="hidden" name="sort" th:value="${sort}" />
+
+                    <button type="submit">NEXT</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
 </div>
 </body>
 </html>
+
+
+
+

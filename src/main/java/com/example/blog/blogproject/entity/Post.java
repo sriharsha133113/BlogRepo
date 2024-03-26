@@ -1,6 +1,7 @@
 package com.example.blog.blogproject.entity;
 
 import com.example.blog.blogproject.service.TagService;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 
 @Entity
 @Table(name = "posts")
@@ -40,6 +42,7 @@ public class Post {
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
     @JoinColumn(name = "author_id")
+    @JsonIgnore
     private User author ;
 
     @ManyToMany(fetch =FetchType.LAZY,cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH})
@@ -157,8 +160,6 @@ public class Post {
 
     }
 
-
-
     public void setTags(String tags) {
         List<String> tagNames = Arrays.asList(tags.split(","));
         List<Tags> tag = new ArrayList<>();
@@ -183,7 +184,6 @@ public class Post {
         }
         comments.add(comment);
     }
-
 
     public List<Comments> getComments() {
         return comments;

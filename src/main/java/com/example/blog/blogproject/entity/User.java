@@ -12,7 +12,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "name")
+    @Column(name = "username")
     private String name;
 
     @Column(name = "email")
@@ -20,7 +20,11 @@ public class User {
 
     @Column(name = "password")
     private String password;
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+    private Role role;
 
+    @Column(name="enabled")
+    public boolean enabled;
 
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "author", cascade = CascadeType.ALL)
@@ -73,6 +77,22 @@ public class User {
 
     public void setPosts(List<Post> posts) {
         this.posts = posts;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
